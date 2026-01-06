@@ -3,12 +3,24 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
+    "prebuild": "expo prebuild",
+    "clean": "expo prebuild --clean",
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android --device",
+    "android:build": "eas build --platform android --profile preview --local",
+    "android:prod": "eas build --platform android --profile production",
+    "ios": "expo run:ios --device",
+    "ios:build": "eas build --platform ios --profile preview --local",
+    "ios:prod": "eas build --platform ios --profile production",
+    "submit": "eas submit",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "lint": "expo lint",
+    "bundle:analyze": "EXPO_ATLAS=true npx expo start --no-dev",
+    "bundle:analyze:dev": "EXPO_ATLAS=true npx expo start",
+    "bundle:analyze:export": "EXPO_ATLAS=true npx expo export --source-maps",
+    "bundle:atlas:open": "npx expo-atlas .expo/atlas.jsonl"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
