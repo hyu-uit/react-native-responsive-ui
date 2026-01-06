@@ -3,10 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@/*": ["./*"],
-      "@ui/responsive": ["./src/scaling"],
-      "@ui/tokens": ["./src/tokens"],
-      "react-native-responsive-ui": ["./src/index"]
+      "@/*": ["./*"]
     }
   },
   "include": [

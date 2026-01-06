@@ -1,746 +1,374 @@
-import { ScrollView, Text, View } from "react-native";
-
 import {
   createScaledStyles,
-  responsive,
-  ResponsiveSwitch,
-  s,
-  space,
-  useDeviceType,
-  useOrientation,
   useResponsiveConfig,
-  useScaledValue,
-  useScaleFactor,
-} from "react-native-responsive-ui";
+} from "@vincent-huy-uit/react-native-responsive-ui";
+import { Image } from "expo-image";
+import { useState } from "react";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Sample data for the dashboard
-const stats = [
-  { label: "Users", value: "12.5K", change: "+12%", color: "#10B981" },
-  { label: "Revenue", value: "$45.2K", change: "+8%", color: "#6366F1" },
-  { label: "Orders", value: "1,234", change: "+23%", color: "#F59E0B" },
-  // { label: "Growth", value: "18.2%", change: "+5%", color: "#EC4899" },
+/**
+ * SCALING SYSTEM DEMO
+ *
+ * Real use case: E-commerce Marketplace
+ * Shows how the scaling system automatically adapts
+ * UI elements across different screen sizes.
+ */
+
+const categories = ["All", "Tech", "Audio", "Accessories"];
+
+const products = [
+  {
+    id: 1,
+    name: "Wireless Headphones",
+    subtitle: "Premium Sound",
+    price: 299.0,
+    tag: "NEW",
+    tagColor: "#3B82F6",
+    image:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80",
+  },
+  {
+    id: 2,
+    name: "Mechanical Keyboard",
+    subtitle: "Tactile Switch",
+    price: 149.5,
+    tag: null,
+    tagColor: null,
+    image:
+      "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&q=80",
+  },
+  {
+    id: 3,
+    name: "Smart Watch Series 7",
+    subtitle: "Fitness Tracker",
+    price: 399.0,
+    tag: "SALE",
+    tagColor: "#EF4444",
+    image:
+      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80",
+  },
+  {
+    id: 4,
+    name: "Ergonomic Mouse",
+    subtitle: "Wireless",
+    price: 89.99,
+    tag: null,
+    tagColor: null,
+    image:
+      "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&q=80",
+  },
+  {
+    id: 5,
+    name: "VR Headset Pro",
+    subtitle: "Immersive 3D",
+    price: 599.0,
+    tag: null,
+    tagColor: null,
+    image:
+      "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=400&q=80",
+  },
+  {
+    id: 6,
+    name: "Portable Speaker",
+    subtitle: "Waterproof",
+    price: 79.99,
+    tag: null,
+    tagColor: null,
+    image:
+      "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&q=80",
+  },
 ];
 
-const features = [
-  {
-    icon: "📐",
-    title: "Auto Scaling",
-    desc: "Scale values proportionally across all screen sizes",
-  },
-  {
-    icon: "📱",
-    title: "Breakpoints",
-    desc: "Detect mobile, tablet, and desktop automatically",
-  },
-  {
-    icon: "🎯",
-    title: "Responsive",
-    desc: "Choose different values per device type",
-  },
-];
-
-// Mobile layout - stacked vertical cards
-function MobileLayoutDemo() {
+function ProductCard({ product }: { product: (typeof products)[0] }) {
   return (
-    <View style={layoutStyles.mobileContainer}>
-      <View style={layoutStyles.mobileCard}>
-        <Text style={layoutStyles.cardIcon}>📱</Text>
-        <View style={layoutStyles.cardContent}>
-          <Text style={layoutStyles.cardTitle}>Mobile Layout</Text>
-          <Text style={layoutStyles.cardDesc}>
-            Stacked vertical cards optimized for narrow screens
-          </Text>
-        </View>
+    <View style={styles.card}>
+      {/* Product Image */}
+      <View style={styles.imageContainer}>
+        <Image
+          source={{ uri: product.image }}
+          style={styles.productImage}
+          contentFit="cover"
+        />
+        {product.tag && (
+          <View style={[styles.tag, { backgroundColor: product.tagColor }]}>
+            <Text style={styles.tagText}>{product.tag}</Text>
+          </View>
+        )}
       </View>
-      <View style={layoutStyles.mobileCard}>
-        <Text style={layoutStyles.cardIcon}>👆</Text>
-        <View style={layoutStyles.cardContent}>
-          <Text style={layoutStyles.cardTitle}>Touch First</Text>
-          <Text style={layoutStyles.cardDesc}>
-            Large tap targets and swipe gestures
-          </Text>
-        </View>
-      </View>
-    </View>
-  );
-}
 
-// Tablet layout - side by side with sidebar
-function TabletLayoutDemo() {
-  return (
-    <View style={layoutStyles.tabletContainer}>
-      <View style={layoutStyles.sidebar}>
-        <Text style={layoutStyles.sidebarIcon}>📋</Text>
-        <Text style={layoutStyles.sidebarText}>Menu</Text>
-        <View style={layoutStyles.sidebarDivider} />
-        <Text style={layoutStyles.sidebarItem}>Home</Text>
-        <Text style={layoutStyles.sidebarItem}>Search</Text>
-        <Text style={layoutStyles.sidebarItem}>Settings</Text>
-      </View>
-      <View style={layoutStyles.mainContent}>
-        <Text style={layoutStyles.tabletTitle}>Tablet Layout</Text>
-        <Text style={layoutStyles.tabletDesc}>
-          Master-detail pattern with persistent sidebar navigation. This layout
-          is completely different from mobile - not just responsive values!
+      {/* Product Info */}
+      <View style={styles.cardContent}>
+        <Text style={styles.productName} numberOfLines={2}>
+          {product.name}
         </Text>
-        <View style={layoutStyles.tabletBadge}>
-          <Text style={layoutStyles.badgeText}>ResponsiveSwitch</Text>
+        <Text style={styles.productSubtitle}>{product.subtitle}</Text>
+
+        {/* Price Row */}
+        <View style={styles.priceRow}>
+          <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+          <Pressable style={styles.addButton}>
+            <Text style={styles.addButtonText}>+</Text>
+          </Pressable>
         </View>
       </View>
     </View>
   );
 }
 
-// Using createScaledStyles - no need to wrap every value with s()!
-const layoutStyles = createScaledStyles({
-  // Mobile Layout
-  mobileContainer: {
-    gap: 8,
-  },
-  mobileCard: {
-    backgroundColor: "#1E293B",
-    borderRadius: 12,
-    padding: 16,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
-  },
-  cardIcon: {
-    fontSize: 28,
-  },
-  cardContent: {
-    flex: 1, // flex is NOT scaled (ratio)
-  },
-  cardTitle: {
-    color: "#F8FAFC",
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  cardDesc: {
-    color: "#94A3B8",
-    fontSize: 12,
-  },
-
-  // Tablet Layout
-  tabletContainer: {
-    flexDirection: "row",
-    backgroundColor: "#1E293B",
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-  sidebar: {
-    width: 100,
-    backgroundColor: "#334155",
-    padding: 16,
-    alignItems: "center",
-  },
-  sidebarIcon: {
-    fontSize: 24,
-    marginBottom: 4,
-  },
-  sidebarText: {
-    color: "#F8FAFC",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  sidebarDivider: {
-    width: "100%",
-    height: 1,
-    backgroundColor: "#475569",
-    marginVertical: 8,
-  },
-  sidebarItem: {
-    color: "#94A3B8",
-    fontSize: 12,
-    marginVertical: 4,
-  },
-  mainContent: {
-    flex: 1, // flex is NOT scaled (ratio)
-    padding: 24,
-  },
-  tabletTitle: {
-    color: "#F8FAFC",
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 8,
-  },
-  tabletDesc: {
-    color: "#94A3B8",
-    fontSize: 16,
-    lineHeight: 22,
-    marginBottom: 16,
-  },
-  tabletBadge: {
-    backgroundColor: "#6366F1",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    alignSelf: "flex-start",
-  },
-  badgeText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-});
-
-export default function HomeScreen() {
-  const deviceType = useDeviceType();
-  const orientation = useOrientation();
-  const { screenWidth, screenHeight } = useResponsiveConfig();
-  const scaleFactor = useScaleFactor(); // Reactive - updates on rotation!
-
-  // Use reactive scaled values for dynamic sizing
-  const dynamicPadding = useScaledValue(16);
-  const dynamicFontSize = useScaledValue(24);
-
-  // Responsive values that change per breakpoint
-  const cardColumns = responsive({ mobile: 2, tablet: 3, desktop: 3 });
-  const featureColumns = responsive({ mobile: 1, tablet: 2, desktop: 3 });
-  const headerPadding = responsive({ mobile: space.md, tablet: space.xl });
-  const showFullStats = responsive({ mobile: false, tablet: true });
+export default function ScalingScreen() {
+  const [activeCategory, setActiveCategory] = useState("All");
+  const { screenWidth, scaleFactor } = useResponsiveConfig();
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable style={styles.headerButton}>
+          <Text style={styles.headerButtonText}>←</Text>
+        </Pressable>
+        <Text style={styles.headerTitle}>Responsive Grid</Text>
+        <Pressable style={styles.headerButton}>
+          <Text style={styles.headerButtonText}>👁</Text>
+        </Pressable>
+      </View>
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero Header */}
-        <View style={[styles.header, { padding: headerPadding }]}>
-          <View style={styles.badgeRow}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{deviceType.toUpperCase()}</Text>
-            </View>
-            <View
+        {/* Title Section */}
+        <View style={styles.titleSection}>
+          <Text style={styles.title}>Marketplace Demo</Text>
+          <Text style={styles.subtitle}>Scaling typography & layouts</Text>
+        </View>
+
+        {/* Categories */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesScroll}
+          contentContainerStyle={styles.categoriesContent}
+        >
+          {categories.map((cat) => (
+            <Pressable
+              key={cat}
+              onPress={() => setActiveCategory(cat)}
               style={[
-                styles.badge,
-                {
-                  backgroundColor:
-                    orientation === "landscape" ? "#10B981" : "#6366F1",
-                },
+                styles.categoryChip,
+                activeCategory === cat && styles.categoryChipActive,
               ]}
             >
-              <Text style={styles.badgeText}>
-                {orientation === "landscape" ? "🔄 LANDSCAPE" : "📱 PORTRAIT"}
-              </Text>
-            </View>
-          </View>
-          <Text style={styles.heroTitle}>react-native-responsive-ui</Text>
-          <Text style={styles.heroSubtitle}>
-            Build beautiful responsive apps with ease
-          </Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{scaleFactor.toFixed(2)}x</Text>
-              <Text style={styles.statLabel}>Scale</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{Math.round(screenWidth)}</Text>
-              <Text style={styles.statLabel}>Width</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{Math.round(screenHeight)}</Text>
-              <Text style={styles.statLabel}>Height</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Dashboard Cards - responsive grid */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Dashboard</Text>
-          <Text style={styles.sectionDesc}>
-            Cards adapt from {cardColumns} columns based on screen size
-          </Text>
-          <View
-            style={[
-              styles.cardGrid,
-              { flexDirection: cardColumns === 1 ? "column" : "row" },
-            ]}
-          >
-            {stats.map((stat, index) => (
-              <View
-                key={stat.label}
-                style={[
-                  styles.card,
-                  {
-                    width:
-                      cardColumns === 1 ? "100%" : `${100 / cardColumns - 2}%`,
-                    borderLeftColor: stat.color,
-                  },
-                ]}
-              >
-                <Text style={styles.cardValue}>{stat.value}</Text>
-                <Text style={styles.cardLabel}>{stat.label}</Text>
-                {showFullStats && (
-                  <View
-                    style={[
-                      styles.changeBadge,
-                      { backgroundColor: stat.color + "20" },
-                    ]}
-                  >
-                    <Text style={[styles.changeText, { color: stat.color }]}>
-                      {stat.change}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Features - responsive layout */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Features</Text>
-          <Text style={styles.sectionDesc}>
-            Layout changes: {featureColumns} column
-            {featureColumns > 1 ? "s" : ""} on {deviceType}
-          </Text>
-          <View
-            style={[
-              styles.featureGrid,
-              { flexDirection: featureColumns === 1 ? "column" : "row" },
-            ]}
-          >
-            {features.map((feature) => (
-              <View
-                key={feature.title}
-                style={[
-                  styles.featureCard,
-                  {
-                    width:
-                      featureColumns === 1
-                        ? "100%"
-                        : `${100 / featureColumns - 2}%`,
-                  },
-                ]}
-              >
-                <Text style={styles.featureIcon}>{feature.icon}</Text>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDesc}>{feature.desc}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Code Preview */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Usage</Text>
-          <View style={styles.codeBlock}>
-            <Text style={styles.code}>
-              <Text style={styles.codeKeyword}>const</Text> device ={" "}
-              <Text style={styles.codeFunc}>useDeviceType</Text>();{"\n"}
-              <Text style={styles.codeComment}>// → "{deviceType}"</Text>
-              {"\n\n"}
-              <Text style={styles.codeKeyword}>const</Text> cols ={" "}
-              <Text style={styles.codeFunc}>responsive</Text>({"{"}
-              {"\n"}
-              {"  "}mobile: <Text style={styles.codeNum}>1</Text>,{"\n"}
-              {"  "}tablet: <Text style={styles.codeNum}>2</Text>,{"\n"}
-              {"  "}desktop: <Text style={styles.codeNum}>4</Text>
-              {"\n"}
-              {"}"});{"\n"}
-              <Text style={styles.codeComment}>// → {cardColumns}</Text>
-              {"\n\n"}
-              <Text style={styles.codeKeyword}>const</Text> padding ={" "}
-              <Text style={styles.codeFunc}>s</Text>(
-              <Text style={styles.codeNum}>16</Text>);{"\n"}
-              <Text style={styles.codeComment}>// → {s(16).toFixed(1)}</Text>
-            </Text>
-          </View>
-        </View>
-
-        {/* Orientation Demo */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Orientation</Text>
-          <Text style={styles.sectionDesc}>
-            Rotate your device to see real-time updates!
-          </Text>
-          <View style={styles.orientationCard}>
-            <View style={styles.orientationRow}>
-              <View style={styles.orientationItem}>
-                <Text style={styles.orientationIcon}>
-                  {orientation === "portrait" ? "📱" : "📱"}
-                </Text>
-                <Text style={styles.orientationValue}>
-                  {orientation.charAt(0).toUpperCase() + orientation.slice(1)}
-                </Text>
-                <Text style={styles.orientationLabel}>Orientation</Text>
-              </View>
-              <View style={styles.orientationDivider} />
-              <View style={styles.orientationItem}>
-                <Text style={styles.orientationIcon}>📐</Text>
-                <Text style={styles.orientationValue}>
-                  {Math.round(screenWidth)} × {Math.round(screenHeight)}
-                </Text>
-                <Text style={styles.orientationLabel}>Dimensions</Text>
-              </View>
-            </View>
-
-            {/* Dynamic scaling demo */}
-            <View style={styles.dynamicScaleDemo}>
-              <Text style={styles.dynamicScaleLabel}>
-                useScaledValue(24) → {dynamicFontSize.toFixed(1)}
-              </Text>
               <Text
-                style={[styles.dynamicScaleText, { fontSize: dynamicFontSize }]}
+                style={[
+                  styles.categoryText,
+                  activeCategory === cat && styles.categoryTextActive,
+                ]}
               >
-                This text scales on rotation!
+                {cat}
               </Text>
-            </View>
+            </Pressable>
+          ))}
+        </ScrollView>
 
-            <View style={styles.orientationHint}>
-              <Text style={styles.orientationHintText}>
-                💡 Use useScaledValue() for dynamic scaling that updates on
-                rotation
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Scaling Demo */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Scaling Demo</Text>
-          <Text style={styles.sectionDesc}>
-            Font sizes scale automatically with s()
-          </Text>
-          <View style={styles.scaleRow}>
-            {[12, 16, 20, 24, 32].map((size) => (
-              <View key={size} style={styles.scaleItem}>
-                <Text style={[styles.scaleText, { fontSize: s(size) }]}>
-                  Aa
-                </Text>
-                <Text style={styles.scaleLabel}>s({size})</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Tokens Demo */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Design Tokens</Text>
-          <Text style={styles.sectionDesc}>
-            Pre-built spacing and typography tokens
-          </Text>
-          <View style={styles.tokenRow}>
-            {(["xs", "sm", "md", "lg", "xl"] as const).map((size) => (
-              <View key={size} style={styles.tokenItem}>
-                <View
-                  style={[
-                    styles.tokenBox,
-                    { width: space[size], height: space[size] },
-                  ]}
-                />
-                <Text style={styles.tokenLabel}>{size}</Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Layout Split Demo */}
-        <View style={[styles.section, { marginBottom: s(48) }]}>
-          <Text style={styles.sectionTitle}>Layout Split</Text>
-          <Text style={styles.sectionDesc}>
-            Render completely different layouts per device type
-          </Text>
-          <ResponsiveSwitch
-            mobile={<MobileLayoutDemo />}
-            tablet={<TabletLayoutDemo />}
-          />
+        {/* Product Grid */}
+        <View style={styles.grid}>
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </View>
       </ScrollView>
+
+      {/* Bottom Status Bar */}
+      <View style={styles.statusBar}>
+        <Text style={styles.statusIcon}>📐</Text>
+        <Text style={styles.statusText}>
+          Width: {Math.round(screenWidth)}dp | Scale: {scaleFactor.toFixed(1)}x
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
 
-// Main styles using createScaledStyles - clean, no s() wrappers needed!
 const styles = createScaledStyles({
   container: {
-    flex: 1, // NOT scaled (ratio)
+    flex: 1,
     backgroundColor: "#0F172A",
-  },
-  scroll: {
-    flex: 1, // NOT scaled (ratio)
-  },
-  scrollContent: {
-    paddingBottom: 40,
   },
 
   // Header
   header: {
-    backgroundColor: "#1E293B",
-    borderRadius: 16,
-    margin: 16,
-    alignItems: "center",
-  },
-  badgeRow: {
     flexDirection: "row",
-    gap: 8,
-    marginBottom: 8,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
-  badge: {
-    backgroundColor: "#6366F1",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  headerButton: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-  },
-  badgeText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 1,
-  },
-  heroTitle: {
-    color: "#F8FAFC",
-    fontSize: 24,
-    fontWeight: "700",
-    textAlign: "center",
-    marginBottom: 4,
-  },
-  heroSubtitle: {
-    color: "#94A3B8",
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 24,
-  },
-  statsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 24,
-  },
-  statItem: {
-    alignItems: "center",
-  },
-  statValue: {
-    color: "#F8FAFC",
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  statLabel: {
-    color: "#64748B",
-    fontSize: 12,
-    marginTop: 2,
-  },
-  divider: {
-    width: 1,
-    height: 32,
-    backgroundColor: "#334155",
-  },
-
-  // Sections
-  section: {
-    paddingHorizontal: 16,
-    marginTop: 24,
-  },
-  sectionTitle: {
-    color: "#F8FAFC",
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  sectionDesc: {
-    color: "#64748B",
-    fontSize: 12,
-    marginBottom: 16,
-  },
-
-  // Dashboard Cards
-  cardGrid: {
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  card: {
-    backgroundColor: "#1E293B",
-    borderRadius: 12,
-    padding: 16,
-    borderLeftWidth: 3,
-  },
-  cardValue: {
-    color: "#F8FAFC",
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  cardLabel: {
-    color: "#94A3B8",
-    fontSize: 12,
-    marginTop: 4,
-  },
-  changeBadge: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 4,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginTop: 8,
-  },
-  changeText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-
-  // Features
-  featureGrid: {
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  featureCard: {
-    backgroundColor: "#1E293B",
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-  },
-  featureIcon: {
-    fontSize: 32,
-    marginBottom: 8,
-  },
-  featureTitle: {
-    color: "#F8FAFC",
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 4,
-  },
-  featureDesc: {
-    color: "#94A3B8",
-    fontSize: 12,
-    textAlign: "center",
-  },
-
-  // Code Block
-  codeBlock: {
-    backgroundColor: "#1E293B",
-    borderRadius: 12,
-    padding: 16,
     borderWidth: 1,
     borderColor: "#334155",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  code: {
-    fontFamily: "monospace",
-    fontSize: 12,
-    color: "#E2E8F0",
-    lineHeight: 20,
+  headerButtonText: {
+    fontSize: 18,
+    color: "#94A3B8",
   },
-  codeKeyword: {
-    color: "#C084FC",
-  },
-  codeFunc: {
-    color: "#22D3EE",
-  },
-  codeNum: {
-    color: "#F59E0B",
-  },
-  codeComment: {
-    color: "#64748B",
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#F8FAFC",
   },
 
-  // Orientation Demo
-  orientationCard: {
-    backgroundColor: "#1E293B",
-    borderRadius: 12,
-    padding: 16,
-  },
-  orientationRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-  },
-  orientationItem: {
-    alignItems: "center",
+  // Scroll
+  scroll: {
     flex: 1,
   },
-  orientationIcon: {
-    fontSize: 32,
-    marginBottom: 8,
+  scrollContent: {
+    paddingBottom: 20,
   },
-  orientationValue: {
+
+  // Title Section
+  titleSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
     color: "#F8FAFC",
-    fontSize: 18,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#64748B",
+  },
+
+  // Categories
+  categoriesScroll: {
+    marginBottom: 20,
+  },
+  categoriesContent: {
+    paddingHorizontal: 20,
+    gap: 10,
+  },
+  categoryChip: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: "#1E293B",
+    borderRadius: 24,
+  },
+  categoryChipActive: {
+    backgroundColor: "#3B82F6",
+  },
+  categoryText: {
+    color: "#94A3B8",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  categoryTextActive: {
+    color: "#fff",
+  },
+
+  // Grid
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+
+  // Card
+  card: {
+    width: "47%",
+    backgroundColor: "#1E293B",
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  imageContainer: {
+    height: 160,
+    backgroundColor: "#334155",
+  },
+  productImage: {
+    width: "100%",
+    height: "100%",
+  },
+  tag: {
+    position: "absolute",
+    top: 12,
+    left: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+  },
+  tagText: {
+    color: "#fff",
+    fontSize: 11,
     fontWeight: "700",
   },
-  orientationLabel: {
+  cardContent: {
+    padding: 14,
+  },
+  productName: {
+    color: "#F8FAFC",
+    fontSize: 15,
+    fontWeight: "600",
+    lineHeight: 20,
+    marginBottom: 2,
+  },
+  productSubtitle: {
     color: "#64748B",
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: 13,
+    marginBottom: 12,
   },
-  orientationDivider: {
-    width: 1,
-    height: 60,
-    backgroundColor: "#334155",
-  },
-  dynamicScaleDemo: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: "#1E293B",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#6366F1",
+  priceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
   },
-  dynamicScaleLabel: {
-    color: "#6366F1",
-    fontSize: 12,
-    fontFamily: "monospace",
-    marginBottom: 8,
+  price: {
+    color: "#3B82F6",
+    fontSize: 17,
+    fontWeight: "700",
   },
-  dynamicScaleText: {
-    color: "#F8FAFC",
-    fontWeight: "600",
+  addButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: "#334155",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  orientationHint: {
-    marginTop: 16,
-    backgroundColor: "#334155",
-    borderRadius: 8,
-    padding: 12,
-  },
-  orientationHintText: {
+  addButtonText: {
     color: "#94A3B8",
-    fontSize: 12,
-    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "400",
+    marginTop: -2,
   },
 
-  // Scaling Demo
-  scaleRow: {
+  // Status Bar
+  statusBar: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#1E293B",
-    borderRadius: 12,
-    padding: 16,
-  },
-  scaleItem: {
+    justifyContent: "center",
     alignItems: "center",
-  },
-  scaleText: {
-    color: "#F8FAFC",
-    fontWeight: "600",
-  },
-  scaleLabel: {
-    color: "#64748B",
-    fontSize: 12,
-    marginTop: 4,
-  },
-
-  // Tokens Demo
-  tokenRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
     backgroundColor: "#1E293B",
-    borderRadius: 12,
-    padding: 16,
+    paddingVertical: 14,
+    gap: 8,
+    marginHorizontal: 40,
+    marginBottom: 8,
+    borderRadius: 24,
   },
-  tokenItem: {
-    alignItems: "center",
+  statusIcon: {
+    fontSize: 14,
   },
-  tokenBox: {
-    backgroundColor: "#6366F1",
-    borderRadius: 4,
-  },
-  tokenLabel: {
-    color: "#64748B",
-    fontSize: 12,
-    marginTop: 4,
+  statusText: {
+    color: "#94A3B8",
+    fontSize: 13,
+    fontFamily: "monospace",
   },
 });

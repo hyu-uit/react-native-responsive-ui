@@ -8,7 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { ResponsiveProvider } from "react-native-responsive-ui";
+import { ResponsiveProvider } from "@vincent-huy-uit/react-native-responsive-ui";
 
 export const unstable_settings = {
   anchor: "(tabs)",
