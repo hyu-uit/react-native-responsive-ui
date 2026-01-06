@@ -4,6 +4,7 @@ import {
   font,
   getScaleFactor,
   responsive,
+  ResponsiveSwitch,
   s,
   space,
   useDeviceType,
@@ -15,7 +16,7 @@ const stats = [
   { label: "Users", value: "12.5K", change: "+12%", color: "#10B981" },
   { label: "Revenue", value: "$45.2K", change: "+8%", color: "#6366F1" },
   { label: "Orders", value: "1,234", change: "+23%", color: "#F59E0B" },
-  { label: "Growth", value: "18.2%", change: "+5%", color: "#EC4899" },
+  // { label: "Growth", value: "18.2%", change: "+5%", color: "#EC4899" },
 ];
 
 const features = [
@@ -34,19 +35,159 @@ const features = [
     title: "Responsive",
     desc: "Choose different values per device type",
   },
-  {
-    icon: "🎨",
-    title: "Design Tokens",
-    desc: "Pre-built spacing, fonts, and radius tokens",
-  },
 ];
+
+// Mobile layout - stacked vertical cards
+function MobileLayoutDemo() {
+  return (
+    <View style={layoutStyles.mobileContainer}>
+      <View style={layoutStyles.mobileCard}>
+        <Text style={layoutStyles.cardIcon}>📱</Text>
+        <View style={layoutStyles.cardContent}>
+          <Text style={layoutStyles.cardTitle}>Mobile Layout</Text>
+          <Text style={layoutStyles.cardDesc}>
+            Stacked vertical cards optimized for narrow screens
+          </Text>
+        </View>
+      </View>
+      <View style={layoutStyles.mobileCard}>
+        <Text style={layoutStyles.cardIcon}>👆</Text>
+        <View style={layoutStyles.cardContent}>
+          <Text style={layoutStyles.cardTitle}>Touch First</Text>
+          <Text style={layoutStyles.cardDesc}>
+            Large tap targets and swipe gestures
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// Tablet layout - side by side with sidebar
+function TabletLayoutDemo() {
+  return (
+    <View style={layoutStyles.tabletContainer}>
+      <View style={layoutStyles.sidebar}>
+        <Text style={layoutStyles.sidebarIcon}>📋</Text>
+        <Text style={layoutStyles.sidebarText}>Menu</Text>
+        <View style={layoutStyles.sidebarDivider} />
+        <Text style={layoutStyles.sidebarItem}>Home</Text>
+        <Text style={layoutStyles.sidebarItem}>Search</Text>
+        <Text style={layoutStyles.sidebarItem}>Settings</Text>
+      </View>
+      <View style={layoutStyles.mainContent}>
+        <Text style={layoutStyles.tabletTitle}>Tablet Layout</Text>
+        <Text style={layoutStyles.tabletDesc}>
+          Master-detail pattern with persistent sidebar navigation. This layout
+          is completely different from mobile - not just responsive values!
+        </Text>
+        <View style={layoutStyles.tabletBadge}>
+          <Text style={layoutStyles.badgeText}>ResponsiveSwitch</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const layoutStyles = StyleSheet.create({
+  // Mobile Layout
+  mobileContainer: {
+    gap: space.sm,
+  },
+  mobileCard: {
+    backgroundColor: "#1E293B",
+    borderRadius: s(12),
+    padding: space.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.md,
+  },
+  cardIcon: {
+    fontSize: s(28),
+  },
+  cardContent: {
+    flex: 1,
+  },
+  cardTitle: {
+    color: "#F8FAFC",
+    fontSize: font.body,
+    fontWeight: "600",
+    marginBottom: s(4),
+  },
+  cardDesc: {
+    color: "#94A3B8",
+    fontSize: font.caption,
+  },
+
+  // Tablet Layout
+  tabletContainer: {
+    flexDirection: "row",
+    backgroundColor: "#1E293B",
+    borderRadius: s(12),
+    overflow: "hidden",
+  },
+  sidebar: {
+    width: s(100),
+    backgroundColor: "#334155",
+    padding: space.md,
+    alignItems: "center",
+  },
+  sidebarIcon: {
+    fontSize: s(24),
+    marginBottom: space.xs,
+  },
+  sidebarText: {
+    color: "#F8FAFC",
+    fontSize: font.caption,
+    fontWeight: "600",
+  },
+  sidebarDivider: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "#475569",
+    marginVertical: space.sm,
+  },
+  sidebarItem: {
+    color: "#94A3B8",
+    fontSize: font.caption,
+    marginVertical: s(4),
+  },
+  mainContent: {
+    flex: 1,
+    padding: space.lg,
+  },
+  tabletTitle: {
+    color: "#F8FAFC",
+    fontSize: font.subtitle,
+    fontWeight: "600",
+    marginBottom: space.sm,
+  },
+  tabletDesc: {
+    color: "#94A3B8",
+    fontSize: font.body,
+    lineHeight: s(22),
+    marginBottom: space.md,
+  },
+  tabletBadge: {
+    backgroundColor: "#6366F1",
+    paddingHorizontal: space.sm,
+    paddingVertical: space.xs,
+    borderRadius: s(6),
+    alignSelf: "flex-start",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: font.caption,
+    fontWeight: "600",
+  },
+});
 
 export default function HomeScreen() {
   const deviceType = useDeviceType();
 
   // Responsive values that change per breakpoint
-  const cardColumns = responsive({ mobile: 2, tablet: 4, desktop: 4 });
-  const featureColumns = responsive({ mobile: 1, tablet: 2, desktop: 4 });
+  const cardColumns = responsive({ mobile: 2, tablet: 3, desktop: 3 });
+  const featureColumns = responsive({ mobile: 1, tablet: 2, desktop: 3 });
   const headerPadding = responsive({ mobile: space.md, tablet: space.xl });
   const showFullStats = responsive({ mobile: false, tablet: true });
 
@@ -215,7 +356,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Tokens Demo */}
-        <View style={[styles.section, { marginBottom: space.xxl }]}>
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Design Tokens</Text>
           <Text style={styles.sectionDesc}>
             Pre-built spacing and typography tokens
@@ -233,6 +374,18 @@ export default function HomeScreen() {
               </View>
             ))}
           </View>
+        </View>
+
+        {/* Layout Split Demo */}
+        <View style={[styles.section, { marginBottom: space.xxl }]}>
+          <Text style={styles.sectionTitle}>Layout Split</Text>
+          <Text style={styles.sectionDesc}>
+            Render completely different layouts per device type
+          </Text>
+          <ResponsiveSwitch
+            mobile={<MobileLayoutDemo />}
+            tablet={<TabletLayoutDemo />}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
