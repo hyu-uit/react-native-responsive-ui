@@ -14,12 +14,20 @@ export { getDeviceType, responsive, useDeviceType } from "./breakpoints";
 // Layout split
 export { responsiveComponent, ResponsiveSwitch } from "./layout-split";
 
+// Provider and DX utilities
+export { ResponsiveProvider, useResponsiveConfig } from "./provider";
+export { createScaledStyles } from "./scaled-styles";
+
 // Types
 export type { DeviceType, ResponsiveValues } from "./breakpoints";
 export type {
   ResponsiveComponentVariants,
   ResponsiveSwitchProps,
 } from "./layout-split";
+export type {
+  ResponsiveConfigValue,
+  ResponsiveProviderProps,
+} from "./provider";
 export type { Breakpoints, ScalingConfig } from "./scaling";
 
 // Design tokens

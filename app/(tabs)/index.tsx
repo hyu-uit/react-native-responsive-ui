@@ -1,7 +1,7 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 
 import {
-  font,
+  createScaledStyles,
   getScaleFactor,
   responsive,
   ResponsiveSwitch,
@@ -89,95 +89,96 @@ function TabletLayoutDemo() {
   );
 }
 
-const layoutStyles = StyleSheet.create({
+// Using createScaledStyles - no need to wrap every value with s()!
+const layoutStyles = createScaledStyles({
   // Mobile Layout
   mobileContainer: {
-    gap: space.sm,
+    gap: 8,
   },
   mobileCard: {
     backgroundColor: "#1E293B",
-    borderRadius: s(12),
-    padding: space.md,
+    borderRadius: 12,
+    padding: 16,
     flexDirection: "row",
     alignItems: "center",
-    gap: space.md,
+    gap: 16,
   },
   cardIcon: {
-    fontSize: s(28),
+    fontSize: 28,
   },
   cardContent: {
-    flex: 1,
+    flex: 1, // flex is NOT scaled (ratio)
   },
   cardTitle: {
     color: "#F8FAFC",
-    fontSize: font.body,
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: s(4),
+    marginBottom: 4,
   },
   cardDesc: {
     color: "#94A3B8",
-    fontSize: font.caption,
+    fontSize: 12,
   },
 
   // Tablet Layout
   tabletContainer: {
     flexDirection: "row",
     backgroundColor: "#1E293B",
-    borderRadius: s(12),
+    borderRadius: 12,
     overflow: "hidden",
   },
   sidebar: {
-    width: s(100),
+    width: 100,
     backgroundColor: "#334155",
-    padding: space.md,
+    padding: 16,
     alignItems: "center",
   },
   sidebarIcon: {
-    fontSize: s(24),
-    marginBottom: space.xs,
+    fontSize: 24,
+    marginBottom: 4,
   },
   sidebarText: {
     color: "#F8FAFC",
-    fontSize: font.caption,
+    fontSize: 12,
     fontWeight: "600",
   },
   sidebarDivider: {
     width: "100%",
     height: 1,
     backgroundColor: "#475569",
-    marginVertical: space.sm,
+    marginVertical: 8,
   },
   sidebarItem: {
     color: "#94A3B8",
-    fontSize: font.caption,
-    marginVertical: s(4),
+    fontSize: 12,
+    marginVertical: 4,
   },
   mainContent: {
-    flex: 1,
-    padding: space.lg,
+    flex: 1, // flex is NOT scaled (ratio)
+    padding: 24,
   },
   tabletTitle: {
     color: "#F8FAFC",
-    fontSize: font.subtitle,
+    fontSize: 18,
     fontWeight: "600",
-    marginBottom: space.sm,
+    marginBottom: 8,
   },
   tabletDesc: {
     color: "#94A3B8",
-    fontSize: font.body,
-    lineHeight: s(22),
-    marginBottom: space.md,
+    fontSize: 16,
+    lineHeight: 22,
+    marginBottom: 16,
   },
   tabletBadge: {
     backgroundColor: "#6366F1",
-    paddingHorizontal: space.sm,
-    paddingVertical: space.xs,
-    borderRadius: s(6),
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
     alignSelf: "flex-start",
   },
   badgeText: {
     color: "#fff",
-    fontSize: font.caption,
+    fontSize: 12,
     fontWeight: "600",
   },
 });
@@ -377,7 +378,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Layout Split Demo */}
-        <View style={[styles.section, { marginBottom: space.xxl }]}>
+        <View style={[styles.section, { marginBottom: s(48) }]}>
           <Text style={styles.sectionTitle}>Layout Split</Text>
           <Text style={styles.sectionDesc}>
             Render completely different layouts per device type
@@ -392,165 +393,166 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+// Main styles using createScaledStyles - clean, no s() wrappers needed!
+const styles = createScaledStyles({
   container: {
-    flex: 1,
+    flex: 1, // NOT scaled (ratio)
     backgroundColor: "#0F172A",
   },
   scroll: {
-    flex: 1,
+    flex: 1, // NOT scaled (ratio)
   },
   scrollContent: {
-    paddingBottom: s(40),
+    paddingBottom: 40,
   },
 
   // Header
   header: {
     backgroundColor: "#1E293B",
-    borderRadius: s(16),
-    margin: space.md,
+    borderRadius: 16,
+    margin: 16,
     alignItems: "center",
   },
   badge: {
     backgroundColor: "#6366F1",
-    paddingHorizontal: space.sm,
-    paddingVertical: space.xs,
-    borderRadius: s(20),
-    marginBottom: space.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginBottom: 8,
   },
   badgeText: {
     color: "#fff",
-    fontSize: font.caption,
+    fontSize: 12,
     fontWeight: "700",
     letterSpacing: 1,
   },
   heroTitle: {
     color: "#F8FAFC",
-    fontSize: font.title,
+    fontSize: 24,
     fontWeight: "700",
     textAlign: "center",
-    marginBottom: space.xs,
+    marginBottom: 4,
   },
   heroSubtitle: {
     color: "#94A3B8",
-    fontSize: font.body,
+    fontSize: 16,
     textAlign: "center",
-    marginBottom: space.lg,
+    marginBottom: 24,
   },
   statsRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: space.lg,
+    gap: 24,
   },
   statItem: {
     alignItems: "center",
   },
   statValue: {
     color: "#F8FAFC",
-    fontSize: font.title,
+    fontSize: 24,
     fontWeight: "700",
   },
   statLabel: {
     color: "#64748B",
-    fontSize: font.caption,
-    marginTop: s(2),
+    fontSize: 12,
+    marginTop: 2,
   },
   divider: {
     width: 1,
-    height: s(32),
+    height: 32,
     backgroundColor: "#334155",
   },
 
   // Sections
   section: {
-    paddingHorizontal: space.md,
-    marginTop: space.lg,
+    paddingHorizontal: 16,
+    marginTop: 24,
   },
   sectionTitle: {
     color: "#F8FAFC",
-    fontSize: font.subtitle,
+    fontSize: 18,
     fontWeight: "600",
-    marginBottom: space.xs,
+    marginBottom: 4,
   },
   sectionDesc: {
     color: "#64748B",
-    fontSize: font.caption,
-    marginBottom: space.md,
+    fontSize: 12,
+    marginBottom: 16,
   },
 
   // Dashboard Cards
   cardGrid: {
     flexWrap: "wrap",
-    gap: space.sm,
+    gap: 8,
   },
   card: {
     backgroundColor: "#1E293B",
-    borderRadius: s(12),
-    padding: space.md,
-    borderLeftWidth: s(3),
+    borderRadius: 12,
+    padding: 16,
+    borderLeftWidth: 3,
   },
   cardValue: {
     color: "#F8FAFC",
-    fontSize: font.title,
+    fontSize: 24,
     fontWeight: "700",
   },
   cardLabel: {
     color: "#94A3B8",
-    fontSize: font.caption,
-    marginTop: s(4),
+    fontSize: 12,
+    marginTop: 4,
   },
   changeBadge: {
     alignSelf: "flex-start",
-    paddingHorizontal: space.xs,
-    paddingVertical: s(2),
-    borderRadius: s(4),
-    marginTop: space.sm,
+    paddingHorizontal: 4,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginTop: 8,
   },
   changeText: {
-    fontSize: font.caption,
+    fontSize: 12,
     fontWeight: "600",
   },
 
   // Features
   featureGrid: {
     flexWrap: "wrap",
-    gap: space.sm,
+    gap: 8,
   },
   featureCard: {
     backgroundColor: "#1E293B",
-    borderRadius: s(12),
-    padding: space.md,
+    borderRadius: 12,
+    padding: 16,
     alignItems: "center",
   },
   featureIcon: {
-    fontSize: s(32),
-    marginBottom: space.sm,
+    fontSize: 32,
+    marginBottom: 8,
   },
   featureTitle: {
     color: "#F8FAFC",
-    fontSize: font.body,
+    fontSize: 16,
     fontWeight: "600",
-    marginBottom: space.xs,
+    marginBottom: 4,
   },
   featureDesc: {
     color: "#94A3B8",
-    fontSize: font.caption,
+    fontSize: 12,
     textAlign: "center",
   },
 
   // Code Block
   codeBlock: {
     backgroundColor: "#1E293B",
-    borderRadius: s(12),
-    padding: space.md,
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
     borderColor: "#334155",
   },
   code: {
     fontFamily: "monospace",
-    fontSize: font.caption,
+    fontSize: 12,
     color: "#E2E8F0",
-    lineHeight: s(20),
+    lineHeight: 20,
   },
   codeKeyword: {
     color: "#C084FC",
@@ -570,8 +572,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     backgroundColor: "#1E293B",
-    borderRadius: s(12),
-    padding: space.md,
+    borderRadius: 12,
+    padding: 16,
   },
   scaleItem: {
     alignItems: "center",
@@ -582,8 +584,8 @@ const styles = StyleSheet.create({
   },
   scaleLabel: {
     color: "#64748B",
-    fontSize: font.caption,
-    marginTop: space.xs,
+    fontSize: 12,
+    marginTop: 4,
   },
 
   // Tokens Demo
@@ -592,19 +594,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-end",
     backgroundColor: "#1E293B",
-    borderRadius: s(12),
-    padding: space.md,
+    borderRadius: 12,
+    padding: 16,
   },
   tokenItem: {
     alignItems: "center",
   },
   tokenBox: {
     backgroundColor: "#6366F1",
-    borderRadius: s(4),
+    borderRadius: 4,
   },
   tokenLabel: {
     color: "#64748B",
-    fontSize: font.caption,
-    marginTop: space.xs,
+    fontSize: 12,
+    marginTop: 4,
   },
 });
