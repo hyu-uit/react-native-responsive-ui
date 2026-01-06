@@ -7,36 +7,88 @@ import { Dimensions } from "react-native";
 const DEFAULT_BASE_WIDTH = 375;
 
 /**
- * Configuration for the scaling system.
+ * Default breakpoint thresholds for device type detection.
  */
-interface ScalingConfig {
+const DEFAULT_BREAKPOINTS = {
+  tablet: 768,
+  desktop: 1024,
+};
+
+/**
+ * Breakpoint thresholds for device type detection.
+ */
+export interface Breakpoints {
+  tablet: number;
+  desktop: number;
+}
+
+/**
+ * Configuration for the scaling and breakpoint system.
+ */
+export interface ScalingConfig {
   baseWidth: number;
+  breakpoints: Breakpoints;
 }
 
 // Module-level state
 let config: ScalingConfig = {
   baseWidth: DEFAULT_BASE_WIDTH,
+  breakpoints: { ...DEFAULT_BREAKPOINTS },
 };
 
 // Cache screen width at module load time for performance
 const screenWidth = Dimensions.get("window").width;
 
 /**
- * Configure the scaling system.
+ * Configure the scaling and breakpoint system.
  * Call this once at app startup before using scaling functions.
  *
  * @param options - Configuration options
  * @param options.baseWidth - The design baseline width (default: 375)
+ * @param options.breakpoints - Custom breakpoint thresholds
  *
  * @example
  * ```ts
  * import { configure } from 'react-native-responsive-ui';
  *
  * configure({ baseWidth: 414 }); // Use iPhone 11 Pro as baseline
+ *
+ * // Or with custom breakpoints
+ * configure({
+ *   baseWidth: 375,
+ *   breakpoints: { tablet: 600, desktop: 900 }
+ * });
  * ```
  */
-export function configure(options: Partial<ScalingConfig>): void {
-  config = { ...config, ...options };
+export function configure(
+  options: Partial<Omit<ScalingConfig, "breakpoints">> & {
+    breakpoints?: Partial<Breakpoints>;
+  }
+): void {
+  const { breakpoints, ...rest } = options;
+  config = {
+    ...config,
+    ...rest,
+    breakpoints: {
+      ...config.breakpoints,
+      ...(breakpoints ?? {}),
+    },
+  };
+}
+
+/**
+ * Get the current configuration.
+ * Useful for breakpoint detection.
+ */
+export function getConfig(): ScalingConfig {
+  return config;
+}
+
+/**
+ * Get the cached screen width.
+ */
+export function getScreenWidth(): number {
+  return screenWidth;
 }
 
 /**
