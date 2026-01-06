@@ -1,4 +1,5 @@
-import { Dimensions } from "react-native";
+import { useEffect, useState } from "react";
+import { Dimensions, ScaledSize } from "react-native";
 
 /**
  * Default base width for scaling calculations.
@@ -30,14 +31,53 @@ export interface ScalingConfig {
   breakpoints: Breakpoints;
 }
 
+/**
+ * Screen dimensions with width and height.
+ */
+export interface ScreenDimensions {
+  width: number;
+  height: number;
+}
+
 // Module-level state
 let config: ScalingConfig = {
   baseWidth: DEFAULT_BASE_WIDTH,
   breakpoints: { ...DEFAULT_BREAKPOINTS },
 };
 
-// Cache screen width at module load time for performance
-const screenWidth = Dimensions.get("window").width;
+// Dynamic screen dimensions - updated on dimension changes
+let screenDimensions: ScreenDimensions = {
+  width: Dimensions.get("window").width,
+  height: Dimensions.get("window").height,
+};
+
+// Dimension change listeners
+type DimensionListener = (dimensions: ScreenDimensions) => void;
+const dimensionListeners = new Set<DimensionListener>();
+
+// Subscribe to React Native dimension changes and update cached values
+Dimensions.addEventListener("change", ({ window }: { window: ScaledSize }) => {
+  screenDimensions = {
+    width: window.width,
+    height: window.height,
+  };
+  // Notify all listeners
+  dimensionListeners.forEach((listener) => listener(screenDimensions));
+});
+
+/**
+ * Subscribe to dimension changes.
+ * @param listener - Callback invoked when dimensions change
+ * @returns Unsubscribe function
+ */
+export function subscribeToDimensionChanges(
+  listener: DimensionListener
+): () => void {
+  dimensionListeners.add(listener);
+  return () => {
+    dimensionListeners.delete(listener);
+  };
+}
 
 /**
  * Configure the scaling and breakpoint system.
@@ -85,10 +125,27 @@ export function getConfig(): ScalingConfig {
 }
 
 /**
- * Get the cached screen width.
+ * Get the current screen dimensions.
+ * Updates dynamically when the screen dimensions change.
+ */
+export function getScreenDimensions(): ScreenDimensions {
+  return screenDimensions;
+}
+
+/**
+ * Get the current screen width.
+ * Updates dynamically when the screen dimensions change.
  */
 export function getScreenWidth(): number {
-  return screenWidth;
+  return screenDimensions.width;
+}
+
+/**
+ * Get the current screen height.
+ * Updates dynamically when the screen dimensions change.
+ */
+export function getScreenHeight(): number {
+  return screenDimensions.height;
 }
 
 /**
@@ -104,7 +161,7 @@ export function getScreenWidth(): number {
  * ```
  */
 export function getScaleFactor(): number {
-  return screenWidth / config.baseWidth;
+  return screenDimensions.width / config.baseWidth;
 }
 
 /**
@@ -167,4 +224,87 @@ export function createScaledStyle<T extends StyleObject>(styles: T): T {
   }
 
   return scaled as T;
+}
+
+/**
+ * React hook that returns the current screen dimensions reactively.
+ * Updates when the screen dimensions change (e.g., on rotation).
+ *
+ * @returns The current screen dimensions { width, height }
+ *
+ * @example
+ * ```tsx
+ * import { useDimensions } from 'react-native-responsive-ui';
+ *
+ * function MyComponent() {
+ *   const { width, height } = useDimensions();
+ *   return <Text>Screen: {width} x {height}</Text>;
+ * }
+ * ```
+ */
+export function useDimensions(): ScreenDimensions {
+  const [dimensions, setDimensions] = useState<ScreenDimensions>(
+    () => screenDimensions
+  );
+
+  useEffect(() => {
+    const unsubscribe = subscribeToDimensionChanges((newDimensions) => {
+      setDimensions(newDimensions);
+    });
+    return unsubscribe;
+  }, []);
+
+  return dimensions;
+}
+
+/**
+ * React hook that returns the current scale factor reactively.
+ * Updates when the screen dimensions change (e.g., on rotation).
+ *
+ * @returns The current scale factor (screenWidth / baseWidth)
+ *
+ * @example
+ * ```tsx
+ * import { useScaleFactor } from 'react-native-responsive-ui';
+ *
+ * function MyComponent() {
+ *   const scaleFactor = useScaleFactor();
+ *   return <Text>Scale: {scaleFactor.toFixed(2)}x</Text>;
+ * }
+ * ```
+ */
+export function useScaleFactor(): number {
+  const dimensions = useDimensions();
+  return dimensions.width / config.baseWidth;
+}
+
+/**
+ * React hook that returns a scaled value reactively.
+ * Updates when the screen dimensions change (e.g., on rotation).
+ *
+ * Use this instead of s() when you need values to update on orientation change.
+ *
+ * @param value - The base value to scale
+ * @returns The scaled value based on current screen width
+ *
+ * @example
+ * ```tsx
+ * import { useScaledValue } from 'react-native-responsive-ui';
+ *
+ * function MyComponent() {
+ *   const fontSize = useScaledValue(16);
+ *   const padding = useScaledValue(24);
+ *
+ *   return (
+ *     <Text style={{ fontSize, padding }}>
+ *       This scales on rotation!
+ *     </Text>
+ *   );
+ * }
+ * ```
+ */
+export function useScaledValue(value: number): number {
+  const scaleFactor = useScaleFactor();
+  if (value === 0) return 0;
+  return value * scaleFactor;
 }

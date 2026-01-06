@@ -5,11 +5,22 @@
  * Automatically scale design values across different screen sizes.
  */
 
-// Scaling functions
-export { configure, createScaledStyle, getScaleFactor, s } from "./scaling";
+// Scaling functions and hooks
+export {
+  configure,
+  createScaledStyle,
+  getScaleFactor,
+  s,
+  useDimensions,
+  useScaledValue,
+  useScaleFactor,
+} from "./scaling";
 
 // Breakpoint detection and responsive helpers
 export { getDeviceType, responsive, useDeviceType } from "./breakpoints";
+
+// Orientation detection
+export { getOrientation, useOrientation } from "./orientation";
 
 // Layout split
 export { responsiveComponent, ResponsiveSwitch } from "./layout-split";
@@ -24,11 +35,12 @@ export type {
   ResponsiveComponentVariants,
   ResponsiveSwitchProps,
 } from "./layout-split";
+export type { Orientation } from "./orientation";
 export type {
   ResponsiveConfigValue,
   ResponsiveProviderProps,
 } from "./provider";
-export type { Breakpoints, ScalingConfig } from "./scaling";
+export type { Breakpoints, ScalingConfig, ScreenDimensions } from "./scaling";
 
 // Design tokens
 export { font, radius, space } from "./tokens";

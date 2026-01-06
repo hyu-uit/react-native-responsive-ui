@@ -25,6 +25,12 @@ The system SHALL provide a `ResponsiveProvider` component for declarative config
 - **WHEN** scaling functions are used
 - **THEN** they SHALL use default values (baseWidth: 375, tablet: 768, desktop: 1024)
 
+#### Scenario: Provider responds to dimension changes
+
+- **GIVEN** an app wrapped in `ResponsiveProvider`
+- **WHEN** the device rotates or resizes
+- **THEN** all consumers of the context SHALL re-render with updated dimensions
+
 ### Requirement: Responsive Config Hook
 
 The system SHALL provide a `useResponsiveConfig()` hook for accessing the current configuration in components.
@@ -33,7 +39,13 @@ The system SHALL provide a `useResponsiveConfig()` hook for accessing the curren
 
 - **GIVEN** a component within ResponsiveProvider
 - **WHEN** `useResponsiveConfig()` is called
-- **THEN** it SHALL return the current baseWidth, breakpoints, and screen dimensions
+- **THEN** it SHALL return the current baseWidth, breakpoints, screen dimensions, and orientation
+
+#### Scenario: Config updates on dimension change
+
+- **GIVEN** a component using `useResponsiveConfig()`
+- **WHEN** the device dimensions change (e.g., rotation)
+- **THEN** the component SHALL re-render with updated screenWidth, scaleFactor, and orientation
 
 ### Requirement: Auto-Scaled Styles
 

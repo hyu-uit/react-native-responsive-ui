@@ -2,12 +2,15 @@ import { ScrollView, Text, View } from "react-native";
 
 import {
   createScaledStyles,
-  getScaleFactor,
   responsive,
   ResponsiveSwitch,
   s,
   space,
   useDeviceType,
+  useOrientation,
+  useResponsiveConfig,
+  useScaledValue,
+  useScaleFactor,
 } from "react-native-responsive-ui";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -185,6 +188,13 @@ const layoutStyles = createScaledStyles({
 
 export default function HomeScreen() {
   const deviceType = useDeviceType();
+  const orientation = useOrientation();
+  const { screenWidth, screenHeight } = useResponsiveConfig();
+  const scaleFactor = useScaleFactor(); // Reactive - updates on rotation!
+
+  // Use reactive scaled values for dynamic sizing
+  const dynamicPadding = useScaledValue(16);
+  const dynamicFontSize = useScaledValue(24);
 
   // Responsive values that change per breakpoint
   const cardColumns = responsive({ mobile: 2, tablet: 3, desktop: 3 });
@@ -201,8 +211,23 @@ export default function HomeScreen() {
       >
         {/* Hero Header */}
         <View style={[styles.header, { padding: headerPadding }]}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{deviceType.toUpperCase()}</Text>
+          <View style={styles.badgeRow}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{deviceType.toUpperCase()}</Text>
+            </View>
+            <View
+              style={[
+                styles.badge,
+                {
+                  backgroundColor:
+                    orientation === "landscape" ? "#10B981" : "#6366F1",
+                },
+              ]}
+            >
+              <Text style={styles.badgeText}>
+                {orientation === "landscape" ? "🔄 LANDSCAPE" : "📱 PORTRAIT"}
+              </Text>
+            </View>
           </View>
           <Text style={styles.heroTitle}>react-native-responsive-ui</Text>
           <Text style={styles.heroSubtitle}>
@@ -210,26 +235,18 @@ export default function HomeScreen() {
           </Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>
-                {getScaleFactor().toFixed(2)}x
-              </Text>
+              <Text style={styles.statValue}>{scaleFactor.toFixed(2)}x</Text>
               <Text style={styles.statLabel}>Scale</Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{cardColumns}</Text>
-              <Text style={styles.statLabel}>Columns</Text>
+              <Text style={styles.statValue}>{Math.round(screenWidth)}</Text>
+              <Text style={styles.statLabel}>Width</Text>
             </View>
             <View style={styles.divider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>
-                {deviceType === "mobile"
-                  ? "375"
-                  : deviceType === "tablet"
-                  ? "768"
-                  : "1024"}
-              </Text>
-              <Text style={styles.statLabel}>Breakpoint</Text>
+              <Text style={styles.statValue}>{Math.round(screenHeight)}</Text>
+              <Text style={styles.statLabel}>Height</Text>
             </View>
           </View>
         </View>
@@ -338,6 +355,54 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Orientation Demo */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Orientation</Text>
+          <Text style={styles.sectionDesc}>
+            Rotate your device to see real-time updates!
+          </Text>
+          <View style={styles.orientationCard}>
+            <View style={styles.orientationRow}>
+              <View style={styles.orientationItem}>
+                <Text style={styles.orientationIcon}>
+                  {orientation === "portrait" ? "📱" : "📱"}
+                </Text>
+                <Text style={styles.orientationValue}>
+                  {orientation.charAt(0).toUpperCase() + orientation.slice(1)}
+                </Text>
+                <Text style={styles.orientationLabel}>Orientation</Text>
+              </View>
+              <View style={styles.orientationDivider} />
+              <View style={styles.orientationItem}>
+                <Text style={styles.orientationIcon}>📐</Text>
+                <Text style={styles.orientationValue}>
+                  {Math.round(screenWidth)} × {Math.round(screenHeight)}
+                </Text>
+                <Text style={styles.orientationLabel}>Dimensions</Text>
+              </View>
+            </View>
+
+            {/* Dynamic scaling demo */}
+            <View style={styles.dynamicScaleDemo}>
+              <Text style={styles.dynamicScaleLabel}>
+                useScaledValue(24) → {dynamicFontSize.toFixed(1)}
+              </Text>
+              <Text
+                style={[styles.dynamicScaleText, { fontSize: dynamicFontSize }]}
+              >
+                This text scales on rotation!
+              </Text>
+            </View>
+
+            <View style={styles.orientationHint}>
+              <Text style={styles.orientationHintText}>
+                💡 Use useScaledValue() for dynamic scaling that updates on
+                rotation
+              </Text>
+            </View>
+          </View>
+        </View>
+
         {/* Scaling Demo */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Scaling Demo</Text>
@@ -413,12 +478,16 @@ const styles = createScaledStyles({
     margin: 16,
     alignItems: "center",
   },
+  badgeRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 8,
+  },
   badge: {
     backgroundColor: "#6366F1",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 20,
-    marginBottom: 8,
   },
   badgeText: {
     color: "#fff",
@@ -565,6 +634,71 @@ const styles = createScaledStyles({
   },
   codeComment: {
     color: "#64748B",
+  },
+
+  // Orientation Demo
+  orientationCard: {
+    backgroundColor: "#1E293B",
+    borderRadius: 12,
+    padding: 16,
+  },
+  orientationRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
+  orientationItem: {
+    alignItems: "center",
+    flex: 1,
+  },
+  orientationIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  orientationValue: {
+    color: "#F8FAFC",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  orientationLabel: {
+    color: "#64748B",
+    fontSize: 12,
+    marginTop: 4,
+  },
+  orientationDivider: {
+    width: 1,
+    height: 60,
+    backgroundColor: "#334155",
+  },
+  dynamicScaleDemo: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: "#1E293B",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#6366F1",
+    alignItems: "center",
+  },
+  dynamicScaleLabel: {
+    color: "#6366F1",
+    fontSize: 12,
+    fontFamily: "monospace",
+    marginBottom: 8,
+  },
+  dynamicScaleText: {
+    color: "#F8FAFC",
+    fontWeight: "600",
+  },
+  orientationHint: {
+    marginTop: 16,
+    backgroundColor: "#334155",
+    borderRadius: 8,
+    padding: 12,
+  },
+  orientationHintText: {
+    color: "#94A3B8",
+    fontSize: 12,
+    textAlign: "center",
   },
 
   // Scaling Demo

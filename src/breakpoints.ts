@@ -1,9 +1,33 @@
-import { getConfig, getScreenWidth } from "./scaling";
+import { useContext, useEffect, useState } from "react";
+import { ResponsiveContext } from "./provider";
+import {
+  Breakpoints,
+  getConfig,
+  getScreenWidth,
+  ScreenDimensions,
+  subscribeToDimensionChanges,
+} from "./scaling";
 
 /**
  * Device type based on screen width breakpoints.
  */
 export type DeviceType = "mobile" | "tablet" | "desktop";
+
+/**
+ * Derive device type from screen width and breakpoints.
+ */
+function deriveDeviceType(
+  screenWidth: number,
+  breakpoints: Breakpoints
+): DeviceType {
+  if (screenWidth >= breakpoints.desktop) {
+    return "desktop";
+  }
+  if (screenWidth >= breakpoints.tablet) {
+    return "tablet";
+  }
+  return "mobile";
+}
 
 /**
  * Get the current device type based on screen width and configured breakpoints.
@@ -23,19 +47,15 @@ export type DeviceType = "mobile" | "tablet" | "desktop";
 export function getDeviceType(): DeviceType {
   const screenWidth = getScreenWidth();
   const { breakpoints } = getConfig();
-
-  if (screenWidth >= breakpoints.desktop) {
-    return "desktop";
-  }
-  if (screenWidth >= breakpoints.tablet) {
-    return "tablet";
-  }
-  return "mobile";
+  return deriveDeviceType(screenWidth, breakpoints);
 }
 
 /**
  * React hook that returns the current device type.
- * Use this in components for conditional rendering or styling.
+ * Updates reactively when screen dimensions change.
+ *
+ * When used within ResponsiveProvider, uses context for reactive updates.
+ * When used outside, subscribes to dimension changes directly.
  *
  * @returns The device type: "mobile", "tablet", or "desktop"
  *
@@ -56,9 +76,31 @@ export function getDeviceType(): DeviceType {
  * ```
  */
 export function useDeviceType(): DeviceType {
-  // For v1, we return the static device type since we don't listen to dimension changes.
-  // This will be enhanced in Phase 5 with orientation support.
-  return getDeviceType();
+  const context = useContext(ResponsiveContext);
+
+  // Track device type for fallback when outside provider
+  const [fallbackDeviceType, setFallbackDeviceType] =
+    useState<DeviceType>(getDeviceType);
+
+  // Subscribe to dimension changes when outside provider
+  useEffect(() => {
+    if (context !== null) return; // Don't subscribe if inside provider
+    const unsubscribe = subscribeToDimensionChanges(
+      (dimensions: ScreenDimensions) => {
+        const { breakpoints } = getConfig();
+        setFallbackDeviceType(deriveDeviceType(dimensions.width, breakpoints));
+      }
+    );
+    return unsubscribe;
+  }, [context]);
+
+  // If inside provider, derive from context
+  if (context !== null) {
+    return deriveDeviceType(context.screenWidth, context.breakpoints);
+  }
+
+  // Fallback: use local state
+  return fallbackDeviceType;
 }
 
 /**
@@ -74,6 +116,10 @@ export interface ResponsiveValues<T> {
  * Select a value based on the current device type.
  * Uses mobile-first fallback: if a breakpoint value is not specified,
  * falls back to the next smaller breakpoint.
+ *
+ * Note: This is a utility function, not a hook. It uses the current
+ * screen dimensions at the time of calling. For reactive updates,
+ * use useDeviceType() with conditional logic instead.
  *
  * @param values - Object with values for each breakpoint
  * @returns The value for the current device type

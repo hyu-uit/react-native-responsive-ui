@@ -3,7 +3,7 @@
     "name": "react-native-responsive-ui",
     "slug": "react-native-responsive-ui",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "reactnativeresponsiveui",
     "userInterfaceStyle": "automatic",
